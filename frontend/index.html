@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduAdmin — Student Management System</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+</head>
+<body>
+
+<!-- ======================== LOGIN PAGE ======================== -->
+<div id="login-page">
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon">🎓</div>
+        <h1>EduAdmin</h1>
+        <p>Student Management System</p>
+      </div>
+
+      <div id="login-error" class="alert alert-danger hidden"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-login">Sign In →</button>
+      </form>
+
+      <p class="login-hint">Default: admin / admin123</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== APP PAGE ======================== -->
+<div id="app-page" class="hidden">
+  <div class="app-layout">
+
+    <!-- Sidebar overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🎓</div>
+        <div class="brand-text">
+          <h2>EduAdmin</h2>
+          <span>Management System</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <button class="nav-item" data-page="dashboard">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-item" data-page="students">
+          <span class="nav-icon">👨‍🎓</span> Students
+        </button>
+
+        <div class="nav-section-label" style="margin-top:12px;">Academics</div>
+        <button class="nav-item" data-page="subjects">
+          <span class="nav-icon">📚</span> Subjects
+        </button>
+        <button class="nav-item" data-page="attendance">
+          <span class="nav-icon">📋</span> Attendance
+        </button>
+        <button class="nav-item" data-page="marks">
+          <span class="nav-icon">📈</span> Marks & Results
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-badge">
+          <div class="admin-avatar">👤</div>
+          <div class="admin-info">
+            <h4 id="admin-name">Administrator</h4>
+            <span>Super Admin</span>
+          </div>
+        </div>
+        <button class="btn-logout" id="logout-btn">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" id="hamburger">☰</button>
+          <div>
+            <div class="topbar-title" id="page-title">Dashboard</div>
+            <div class="topbar-subtitle" id="page-subtitle"></div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span class="date-badge" id="date-badge"></span>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="page-content">
+
+        <!-- ============ DASHBOARD ============ -->
+        <section id="page-dashboard" class="page-section">
+
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card blue">
+              <div class="stat-icon">👨‍🎓</div>
+              <div class="stat-info">
+                <h3 id="stat-students">—</h3>
+                <p>Total Students</p>
+              </div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-icon">📚</div>
+              <div class="stat-info">
+                <h3 id="stat-subjects">—</h3>
+                <p>Subjects</p>
+              </div>
+            </div>
+            <div class="stat-card amber">
+              <div class="stat-icon">📋</div>
+              <div class="stat-info">
+                <h3 id="stat-attendance">—</h3>
+                <p>Attendance Rate</p>
+              </div>
+            </div>
+            <div class="stat-card cyan">
+              <div class="stat-icon">📈</div>
+              <div class="stat-info">
+                <h3 id="stat-avg">—</h3>
+                <p>Avg. Result</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="charts-grid">
+            <div class="chart-container">
+              <div class="chart-title">📊 Students by Class</div>
+              <div id="class-chart"></div>
+            </div>
+            <div class="chart-container">
+              <div class="chart-title">ℹ️ Quick Info</div>
+              <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+                <div class="alert alert-info" style="font-size:13px;">
+                  📌 <strong>Getting Started:</strong> Add students, assign subjects, then mark attendance and enter marks.
+                </div>
+                <div style="font-size:13px;color:var(--text-muted);line-height:1.8;">
+                  ✅ All data is stored in-memory (resets on server restart)<br>
+                  ✅ Admin: <code>admin</code> / <code>admin123</code><br>
+                  ✅ REST API available at <code>/api/*</code>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Students Table -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">👥 Recent Students</span>
+              <button class="btn btn-primary btn-sm" onclick="navigateTo('students')">View All →</button>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th><th>Class</th><th>Roll No.</th><th>Email</th><th>Joined</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-students-tbody">
+                  <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ STUDENTS ============ -->
+        <section id="page-students" class="page-section">
+          <div class="section-header">
+            <h2 class="section-title">Student Records</h2>
+            <div class="section-actions">
+              <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="student-search" placeholder="Search by name or ID...">
+              </div>
+              <button class="btn btn-primary" id="btn-add-student">➕ Add Student</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Full Name</th><th>Class</th><th>Roll No.</th>
+                    <th>Date of Birth</th><th>Phone</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="students-tbody">
+                  <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ SUBJECTS ============ -->
+        <section id="page-subjects" class="page-section">
+          <div class="section-header">
+            <h2 class="section-title">Subject Management</h2>
+            <button class="btn btn-primary" id="btn-add-subject">➕ Add Subject</button>
+          </div>
+
+          <div class="card">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr><th>ID</th><th>Subject Name</th><th>Code</th><th>Class</th><th>Max Marks</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="subjects-tbody">
+                  <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ ATTENDANCE ============ -->
+        <section id="page-attendance" class="page-section">
+          <div class="section-header">
+            <h2 class="section-title">Attendance Management</h2>
+            <div class="section-actions">
+              <input type="date" id="attendance-date" class="form-group" 
+                style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;outline:none;">
+              <select id="att-class-filter" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;outline:none;cursor:pointer;">
+                <option value="">All Classes</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+                <option value="11">Class 11</option>
+                <option value="12">Class 12</option>
+              </select>
+              <button class="btn btn-outline" id="btn-mark-all-present">✅ Mark All Present</button>
+              <button class="btn btn-primary" id="btn-save-attendance">💾 Save Attendance</button>
+            </div>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="stats-grid" style="margin-bottom:16px;">
+            <div class="stat-card blue" style="padding:14px;">
+              <div class="stat-icon" style="width:36px;height:36px;font-size:16px;">👥</div>
+              <div class="stat-info">
+                <h3 id="att-stat-total" style="font-size:20px;">0</h3>
+                <p>Total</p>
+              </div>
+            </div>
+            <div class="stat-card green" style="padding:14px;">
+              <div class="stat-icon" style="width:36px;height:36px;font-size:16px;">✅</div>
+              <div class="stat-info">
+                <h3 id="att-stat-present" style="font-size:20px;">0</h3>
+                <p>Present</p>
+              </div>
+            </div>
+            <div class="stat-card" style="padding:14px;">
+              <div class="stat-icon" style="width:36px;height:36px;font-size:16px;">❌</div>
+              <div class="stat-info">
+                <h3 id="att-stat-absent" style="font-size:20px;">0</h3>
+                <p>Absent</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="attendance-grid" id="attendance-grid">
+            <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div>
+          </div>
+        </section>
+
+        <!-- ============ MARKS & RESULTS ============ -->
+        <section id="page-marks" class="page-section">
+
+          <!-- Enter Marks -->
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-header">
+              <span class="card-title">✏️ Enter Marks</span>
+            </div>
+            <div class="card-body">
+              <form id="marks-form">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Student *</label>
+                    <select name="studentId" id="marks-student-select-form" required>
+                      <option value="">Select Student...</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Subject *</label>
+                    <select name="subjectId" id="marks-subject-select" required>
+                      <option value="">Select Subject...</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Exam Type</label>
+                    <select name="examType">
+                      <option value="Final">Final</option>
+                      <option value="Midterm">Midterm</option>
+                      <option value="Unit Test">Unit Test</option>
+                      <option value="Practical">Practical</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Marks Obtained *</label>
+                    <input type="number" name="marks" min="0" max="100" placeholder="e.g. 85" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Max Marks</label>
+                    <input type="number" name="maxMarks" value="100" min="1">
+                  </div>
+                  <div class="form-group">
+                    <label>Exam Date</label>
+                    <input type="date" name="date">
+                  </div>
+                </div>
+                <div style="margin-top:16px;display:flex;gap:10px;">
+                  <button type="submit" class="btn btn-primary" id="save-marks-btn">💾 Save Marks</button>
+                  <button type="reset" class="btn btn-outline">🔄 Reset</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Marks Table -->
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-header">
+              <span class="card-title">📊 Marks Records</span>
+              <select id="marks-student-select" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none;">
+                <option value="">All Students</option>
+              </select>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr><th>Student</th><th>Subject</th><th>Exam</th><th>Marks</th><th>Max</th><th>%</th><th>Grade</th><th>Action</th></tr>
+                </thead>
+                <tbody id="marks-tbody">
+                  <tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Result Generator -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🏆 Result Card Generator</span>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;">
+                <div class="form-group" style="margin:0;flex:1;min-width:200px;">
+                  <label>Select Student</label>
+                  <select id="result-student-select">
+                    <option value="">Choose a student...</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0;min-width:160px;">
+                  <label>Exam Type</label>
+                  <select id="result-exam-type">
+                    <option value="Final">Final</option>
+                    <option value="Midterm">Midterm</option>
+                    <option value="Unit Test">Unit Test</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" id="btn-generate-result">🏆 Generate Result</button>
+              </div>
+              <div id="result-card-container"></div>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+    </div><!-- end main-content -->
+  </div><!-- end app-layout -->
+</div><!-- end app-page -->
+
+<!-- ======================== MODALS ======================== -->
+
+<!-- Student Modal -->
+<div class="modal-overlay" id="student-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="student-modal-title">Add Student</h3>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="student-form">
+        <div class="form-grid">
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Full Name *</label>
+            <input type="text" name="fullName" placeholder="e.g. Aarav Sharma" required>
+          </div>
+          <div class="form-group">
+            <label>Class *</label>
+            <select name="class" required>
+              <option value="">Select Class</option>
+              <option value="1">Class 1</option><option value="2">Class 2</option>
+              <option value="3">Class 3</option><option value="4">Class 4</option>
+              <option value="5">Class 5</option><option value="6">Class 6</option>
+              <option value="7">Class 7</option><option value="8">Class 8</option>
+              <option value="9">Class 9</option><option value="10">Class 10</option>
+              <option value="11">Class 11</option><option value="12">Class 12</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Section *</label>
+            <select name="section" required>
+              <option value="">Select Section</option>
+              <option value="A">A</option><option value="B">B</option>
+              <option value="C">C</option><option value="D">D</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Roll Number *</label>
+            <input type="text" name="rollNumber" placeholder="e.g. 01" required>
+          </div>
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" name="dob">
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="student@example.com">
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" name="phone" placeholder="9876543210">
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Address</label>
+            <textarea name="address" rows="2" placeholder="Enter residential address..." 
+              style="resize:vertical;"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close">Cancel</button>
+      <button class="btn btn-primary" id="save-student-btn" onclick="document.getElementById('student-form').requestSubmit()">💾 Save Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- Subject Modal -->
+<div class="modal-overlay" id="subject-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="subject-modal-title">Add Subject</h3>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="subject-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Subject Name *</label>
+            <input type="text" name="name" placeholder="e.g. Mathematics" required>
+          </div>
+          <div class="form-group">
+            <label>Subject Code *</label>
+            <input type="text" name="code" placeholder="e.g. MATH10" required>
+          </div>
+          <div class="form-group">
+            <label>Class</label>
+            <select name="class">
+              <option value="All">All Classes</option>
+              <option value="9">Class 9</option>
+              <option value="10">Class 10</option>
+              <option value="11">Class 11</option>
+              <option value="12">Class 12</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Max Marks</label>
+            <input type="number" name="maxMarks" value="100" min="1">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline modal-close">Cancel</button>
+      <button class="btn btn-primary" id="save-subject-btn" onclick="document.getElementById('subject-form').requestSubmit()">💾 Save Subject</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/app.js"></script>
+
+<script>
+  // Sync the two student selects for marks
+  document.getElementById('marks-student-select-form').addEventListener('change', function() {
+    document.getElementById('marks-student-select').value = '';
+  });
+  
+  // Wire up the form student select with the marks filter
+  const origPopulate = populateSelect;
+  document.addEventListener('DOMContentLoaded', () => {
+    const formSelect = document.getElementById('marks-student-select-form');
+    const filterSelect = document.getElementById('marks-student-select');
+    // Keep both in sync via MutationObserver
+    const obs = new MutationObserver(() => {
+      if (formSelect.options.length <= 1) return;
+      // already populated
+    });
+  });
+</script>
+
+</body>
+</html>
