@@ -1,0 +1,3841 @@
+{
+  "collection": {
+    "_": {
+      "postman_id": "a3d8f6b0-4b89-4c11-9e1e-2026sqe00001"
+    },
+    "item": [
+      {
+        "id": "ce44f4da-4f13-4046-8487-87d66de61d46",
+        "name": "1. Health Check (GET)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "health"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "17faf8b8-4bbb-4e0f-b5d6-78b867597512",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200 OK', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "pm.test('Health status is ok', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.status).to.eql('ok');",
+                "  pm.expect(json.message).to.include('Student Management API');",
+                "});"
+              ],
+              "_lastExecutionId": "da53126f-6b40-4ae6-a73b-1f19ae7867ff"
+            }
+          }
+        ]
+      },
+      {
+        "id": "3b29fe5d-2724-4d88-bf7f-6647063dcf60",
+        "name": "2. Login Invalid Credentials - Negative (POST)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpass\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "643fe314-dae9-4370-af0a-80d4b621a975",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 401 Unauthorized', function () {",
+                "  pm.response.to.have.status(401);",
+                "});",
+                "pm.test('Response indicates invalid credentials', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.success).to.eql(false);",
+                "  pm.expect(json.message).to.eql('Invalid credentials');",
+                "});"
+              ],
+              "_lastExecutionId": "9f17048b-bf65-4be6-bdc2-7a443efdd8da"
+            }
+          }
+        ]
+      },
+      {
+        "id": "f51dba9a-1f23-4066-b475-d8f35a365c6c",
+        "name": "3. Login Valid Admin (POST)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "d9706f14-c9df-4ffe-bec7-a31f7d718b9a",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200 OK', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "pm.test('Admin login succeeds and returns admin info', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.success).to.eql(true);",
+                "  pm.expect(json.admin.username).to.eql('admin');",
+                "  pm.expect(json.admin.name).to.eql('Administrator');",
+                "});"
+              ],
+              "_lastExecutionId": "0ee6b86a-a124-4c15-9e5a-25c78cc788ff"
+            }
+          }
+        ]
+      },
+      {
+        "id": "41bde84e-3f76-4456-8af1-d641b9da1302",
+        "name": "4. Get All Students (GET)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "students"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "58a9aaab-4e2f-4ff0-9c11-2900b128b890",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200 OK', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "pm.test('Returns non-empty students array', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.success).to.eql(true);",
+                "  pm.expect(json.data).to.be.an('array');",
+                "  pm.expect(json.total).to.be.at.least(3);",
+                "  pm.expect(json.data[0]).to.have.property('fullName');",
+                "});"
+              ],
+              "_lastExecutionId": "0ef39443-f181-4553-a445-66f6fdf3702b"
+            }
+          }
+        ]
+      },
+      {
+        "id": "54418873-bea8-4e5c-95a2-63f3e842bf98",
+        "name": "5. Create Student - Positive (POST)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "students"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fullName\": \"Ayesha Khan\",\n  \"class\": \"10\",\n  \"section\": \"A\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Islamabad\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "36442059-fb21-4f2b-98f0-4695e8b72191",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 201 Created', function () {",
+                "  pm.response.to.have.status(201);",
+                "});",
+                "pm.test('Created student matches payload', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.success).to.eql(true);",
+                "  pm.expect(json.data.fullName).to.eql('Ayesha Khan');",
+                "  pm.expect(json.data.class).to.eql('10');",
+                "  pm.expect(json.data.rollNumber).to.eql('45');",
+                "  pm.collectionVariables.set('createdStudentId', json.data.id);",
+                "});"
+              ],
+              "_lastExecutionId": "e3cf3d0b-ab1e-4e8c-b426-f2a1a7204b17"
+            }
+          }
+        ]
+      },
+      {
+        "id": "2aa4e17f-064a-4a16-b14e-af0822349694",
+        "name": "6. Create Student Missing Fields - Negative (POST)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "students"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fullName\": \"Incomplete Student\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "0da24116-a65e-4594-b1b2-3530b5797589",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 400 Bad Request', function () {",
+                "  pm.response.to.have.status(400);",
+                "});",
+                "pm.test('Validation error returned', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.success).to.eql(false);",
+                "  pm.expect(json.message).to.eql('Required fields missing');",
+                "});"
+              ],
+              "_lastExecutionId": "8e9e81c3-dc02-4c25-86b8-51ca23a3c246"
+            }
+          }
+        ]
+      },
+      {
+        "id": "18bdc143-b7a5-4b48-8567-edb9bb9d2b45",
+        "name": "7. Update Student (PUT)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "students",
+              "{{createdStudentId}}"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fullName\": \"Ayesha Khan Updated\",\n  \"class\": \"10\",\n  \"section\": \"B\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha.updated@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Lahore\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "56700998-cae6-4170-8eea-55566277ad71",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200 OK', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "pm.test('Updated student fields reflect changes', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.success).to.eql(true);",
+                "  pm.expect(json.data.fullName).to.eql('Ayesha Khan Updated');",
+                "  pm.expect(json.data.section).to.eql('B');",
+                "});"
+              ],
+              "_lastExecutionId": "2786ff79-75c4-49fe-8c5c-1931c09e0066"
+            }
+          }
+        ]
+      },
+      {
+        "id": "92a41b02-a6d6-41a9-ad47-a4059551c1ed",
+        "name": "8. Delete Student (DELETE)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "students",
+              "{{createdStudentId}}"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "DELETE"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "ea734637-c6b1-421d-a6a9-eddc471784c2",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200 OK', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "pm.test('Deletion confirmation returned', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.success).to.eql(true);",
+                "  pm.expect(json.message).to.eql('Student deleted successfully');",
+                "});"
+              ],
+              "_lastExecutionId": "dbdf8893-2921-43c7-962c-a6ffd45397b6"
+            }
+          }
+        ]
+      },
+      {
+        "id": "1040d4a5-55d9-4fd4-9fd2-3b980a4ea438",
+        "name": "9. Get Deleted Student - Negative (GET)",
+        "request": {
+          "url": {
+            "path": [
+              "api",
+              "students",
+              "{{createdStudentId}}"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "6e4de88a-3907-4d99-9cb4-f8c5001fc0cb",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 404 Not Found', function () {",
+                "  pm.response.to.have.status(404);",
+                "});",
+                "pm.test('Error message indicates Student not found', function () {",
+                "  const json = pm.response.json();",
+                "  pm.expect(json.success).to.eql(false);",
+                "  pm.expect(json.message).to.eql('Student not found');",
+                "});"
+              ],
+              "_lastExecutionId": "a5f944a2-e98f-4f43-b5b3-da42f1116921"
+            }
+          }
+        ]
+      }
+    ],
+    "event": [],
+    "variable": [
+      {
+        "type": "any",
+        "value": "http://localhost:3000",
+        "key": "baseUrl"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "createdStudentId"
+      }
+    ],
+    "info": {
+      "_postman_id": "a3d8f6b0-4b89-4c11-9e1e-2026sqe00001",
+      "name": "Student Management System API Tests",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Postman API test collection for SE3002 SQE Assignment 3 (Task 5). Covers GET, POST, PUT, DELETE, authentication, positive and negative cases, HTTP status assertions, and response field validation.",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment"
+    },
+    "id": "a3d8f6b0-4b89-4c11-9e1e-2026sqe00002",
+    "name": "Local Development Environment",
+    "values": [
+      {
+        "type": "any",
+        "value": "http://localhost:3055",
+        "key": "baseUrl"
+      }
+    ]
+  },
+  "globals": {
+    "id": "66178585-33c1-429c-a079-a3c05254d2b9",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 9,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 9,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 9,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 9,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 9,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 18,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 9,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 31.22222222222222,
+      "responseMin": 4,
+      "responseMax": 124,
+      "responseSd": 44.08017386983702,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1795782745216,
+      "completed": 1795782745687
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 9,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "e33e8cd8-b020-4c8e-968e-4abea56196db",
+          "httpRequestId": "f09b6f76-a244-42c2-aa06-ae2a046b98d3"
+        },
+        "item": {
+          "id": "ce44f4da-4f13-4046-8487-87d66de61d46",
+          "name": "1. Health Check (GET)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "health"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "17faf8b8-4bbb-4e0f-b5d6-78b867597512",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Health status is ok', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('ok');",
+                  "  pm.expect(json.message).to.include('Student Management API');",
+                  "});"
+                ],
+                "_lastExecutionId": "da53126f-6b40-4ae6-a73b-1f19ae7867ff"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "health"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "e9a9d7c2-0a7e-420d-9bb6-00889f0eb11d",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "db9b2d68-acaa-4845-bac8-9d85cb586035",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "58"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"3a-jeyT7T8InnwEZBWQmuPjN7ub058\""
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              111,
+              107,
+              34,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              116,
+              117,
+              100,
+              101,
+              110,
+              116,
+              32,
+              77,
+              97,
+              110,
+              97,
+              103,
+              101,
+              109,
+              101,
+              110,
+              116,
+              32,
+              65,
+              80,
+              73,
+              32,
+              114,
+              117,
+              110,
+              110,
+              105,
+              110,
+              103,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 22,
+          "responseSize": 58
+        },
+        "id": "ce44f4da-4f13-4046-8487-87d66de61d46",
+        "assertions": [
+          {
+            "assertion": "Status code is 200 OK",
+            "skipped": false
+          },
+          {
+            "assertion": "Health status is ok",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "becf323c-ee0c-4c13-9aa1-b9414f2b4560",
+          "length": 9,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "f15fbb08-128c-4779-88bd-5781d293eb48"
+        },
+        "item": {
+          "id": "3b29fe5d-2724-4d88-bf7f-6647063dcf60",
+          "name": "2. Login Invalid Credentials - Negative (POST)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpass\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "643fe314-dae9-4370-af0a-80d4b621a975",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401 Unauthorized', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Response indicates invalid credentials', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.eql(false);",
+                  "  pm.expect(json.message).to.eql('Invalid credentials');",
+                  "});"
+                ],
+                "_lastExecutionId": "9f17048b-bf65-4be6-bdc2-7a443efdd8da"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "ff49982c-48e5-4f70-80b0-0914c0f589be",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "52",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpass\"\n}"
+          }
+        },
+        "response": {
+          "id": "a2e03853-350b-4d3d-9a87-85ef091cc4f4",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "49"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"31-VmptvJVCxgMiCaKMQdd9IkNBIdc\""
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              73,
+              110,
+              118,
+              97,
+              108,
+              105,
+              100,
+              32,
+              99,
+              114,
+              101,
+              100,
+              101,
+              110,
+              116,
+              105,
+              97,
+              108,
+              115,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 124,
+          "responseSize": 49
+        },
+        "id": "3b29fe5d-2724-4d88-bf7f-6647063dcf60",
+        "assertions": [
+          {
+            "assertion": "Status code is 401 Unauthorized",
+            "skipped": false
+          },
+          {
+            "assertion": "Response indicates invalid credentials",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "31c65393-165e-41b1-a445-e1c08c55cc24",
+          "length": 9,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "65d89bf8-2951-45a8-8322-2fee48660ab2"
+        },
+        "item": {
+          "id": "f51dba9a-1f23-4066-b475-d8f35a365c6c",
+          "name": "3. Login Valid Admin (POST)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d9706f14-c9df-4ffe-bec7-a31f7d718b9a",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Admin login succeeds and returns admin info', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "  pm.expect(json.admin.username).to.eql('admin');",
+                  "  pm.expect(json.admin.name).to.eql('Administrator');",
+                  "});"
+                ],
+                "_lastExecutionId": "0ee6b86a-a124-4c15-9e5a-25c78cc788ff"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "50d5f662-87b8-42b3-81b6-f69dd64a108a",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "51",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+          }
+        },
+        "response": {
+          "id": "d4c8b3b8-37e3-4ed3-aba4-d205a1321d3a",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "106"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"6a-bRYobulERcbg1MagfWpLcUbwMA0\""
+            },
+            {
+              "key": "Set-Cookie",
+              "value": "connect.sid=s%3ACZHV8UrBsaQAJUUEG2yYFrR1S7-rDLXZ.coWgtf7cTJzGWTmqi2JWVVZzGnBe15uCfzoGwqYtqVM; Path=/; Expires=Sat, 28 Nov 2026 12:32:25 GMT; HttpOnly"
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              76,
+              111,
+              103,
+              105,
+              110,
+              32,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              102,
+              117,
+              108,
+              34,
+              44,
+              34,
+              97,
+              100,
+              109,
+              105,
+              110,
+              34,
+              58,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              49,
+              34,
+              44,
+              34,
+              117,
+              115,
+              101,
+              114,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              97,
+              100,
+              109,
+              105,
+              110,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              65,
+              100,
+              109,
+              105,
+              110,
+              105,
+              115,
+              116,
+              114,
+              97,
+              116,
+              111,
+              114,
+              34,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 101,
+          "responseSize": 106
+        },
+        "id": "f51dba9a-1f23-4066-b475-d8f35a365c6c",
+        "assertions": [
+          {
+            "assertion": "Status code is 200 OK",
+            "skipped": false
+          },
+          {
+            "assertion": "Admin login succeeds and returns admin info",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "e6a80ed5-238c-40fa-a9c6-ef9fe02163e9",
+          "length": 9,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "2d577e83-cca6-4acc-819d-10a5febf9f8c"
+        },
+        "item": {
+          "id": "41bde84e-3f76-4456-8af1-d641b9da1302",
+          "name": "4. Get All Students (GET)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "students"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "58a9aaab-4e2f-4ff0-9c11-2900b128b890",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns non-empty students array', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "  pm.expect(json.data).to.be.an('array');",
+                  "  pm.expect(json.total).to.be.at.least(3);",
+                  "  pm.expect(json.data[0]).to.have.property('fullName');",
+                  "});"
+                ],
+                "_lastExecutionId": "0ef39443-f181-4553-a445-66f6fdf3702b"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "students"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "7f729cf1-c3b1-43b5-a562-2ffc756ce43b",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Cookie",
+              "value": "connect.sid=s%3ACZHV8UrBsaQAJUUEG2yYFrR1S7-rDLXZ.coWgtf7cTJzGWTmqi2JWVVZzGnBe15uCfzoGwqYtqVM",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "9a5c8802-351d-4b62-ba4c-ea05b0358924",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "718"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2ce-LBySchsLTZcZ5cJsn62cW5ceS5c\""
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              100,
+              97,
+              116,
+              97,
+              34,
+              58,
+              91,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              83,
+              84,
+              85,
+              48,
+              48,
+              49,
+              34,
+              44,
+              34,
+              102,
+              117,
+              108,
+              108,
+              78,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              65,
+              97,
+              114,
+              97,
+              118,
+              32,
+              83,
+              104,
+              97,
+              114,
+              109,
+              97,
+              34,
+              44,
+              34,
+              99,
+              108,
+              97,
+              115,
+              115,
+              34,
+              58,
+              34,
+              49,
+              48,
+              34,
+              44,
+              34,
+              115,
+              101,
+              99,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              65,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              108,
+              78,
+              117,
+              109,
+              98,
+              101,
+              114,
+              34,
+              58,
+              34,
+              48,
+              49,
+              34,
+              44,
+              34,
+              100,
+              111,
+              98,
+              34,
+              58,
+              34,
+              50,
+              48,
+              48,
+              56,
+              45,
+              48,
+              51,
+              45,
+              49,
+              53,
+              34,
+              44,
+              34,
+              101,
+              109,
+              97,
+              105,
+              108,
+              34,
+              58,
+              34,
+              97,
+              97,
+              114,
+              97,
+              118,
+              64,
+              101,
+              120,
+              97,
+              109,
+              112,
+              108,
+              101,
+              46,
+              99,
+              111,
+              109,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              110,
+              101,
+              34,
+              58,
+              34,
+              57,
+              56,
+              55,
+              54,
+              53,
+              52,
+              51,
+              50,
+              49,
+              48,
+              34,
+              44,
+              34,
+              97,
+              100,
+              100,
+              114,
+              101,
+              115,
+              115,
+              34,
+              58,
+              34,
+              49,
+              50,
+              51,
+              32,
+              77,
+              71,
+              32,
+              82,
+              111,
+              97,
+              100,
+              44,
+              32,
+              68,
+              101,
+              108,
+              104,
+              105,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              49,
+              45,
+              50,
+              55,
+              84,
+              49,
+              50,
+              58,
+              51,
+              50,
+              58,
+              50,
+              52,
+              46,
+              57,
+              52,
+              54,
+              90,
+              34,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              83,
+              84,
+              85,
+              48,
+              48,
+              50,
+              34,
+              44,
+              34,
+              102,
+              117,
+              108,
+              108,
+              78,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              80,
+              114,
+              105,
+              121,
+              97,
+              32,
+              80,
+              97,
+              116,
+              101,
+              108,
+              34,
+              44,
+              34,
+              99,
+              108,
+              97,
+              115,
+              115,
+              34,
+              58,
+              34,
+              49,
+              48,
+              34,
+              44,
+              34,
+              115,
+              101,
+              99,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              66,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              108,
+              78,
+              117,
+              109,
+              98,
+              101,
+              114,
+              34,
+              58,
+              34,
+              48,
+              50,
+              34,
+              44,
+              34,
+              100,
+              111,
+              98,
+              34,
+              58,
+              34,
+              50,
+              48,
+              48,
+              56,
+              45,
+              48,
+              55,
+              45,
+              50,
+              50,
+              34,
+              44,
+              34,
+              101,
+              109,
+              97,
+              105,
+              108,
+              34,
+              58,
+              34,
+              112,
+              114,
+              105,
+              121,
+              97,
+              64,
+              101,
+              120,
+              97,
+              109,
+              112,
+              108,
+              101,
+              46,
+              99,
+              111,
+              109,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              110,
+              101,
+              34,
+              58,
+              34,
+              57,
+              56,
+              55,
+              54,
+              53,
+              52,
+              51,
+              50,
+              49,
+              49,
+              34,
+              44,
+              34,
+              97,
+              100,
+              100,
+              114,
+              101,
+              115,
+              115,
+              34,
+              58,
+              34,
+              52,
+              53,
+              54,
+              32,
+              80,
+              97,
+              114,
+              107,
+              32,
+              83,
+              116,
+              114,
+              101,
+              101,
+              116,
+              44,
+              32,
+              77,
+              117,
+              109,
+              98,
+              97,
+              105,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              49,
+              45,
+              50,
+              55,
+              84,
+              49,
+              50,
+              58,
+              51,
+              50,
+              58,
+              50,
+              52,
+              46,
+              57,
+              52,
+              54,
+              90,
+              34,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              83,
+              84,
+              85,
+              48,
+              48,
+              51,
+              34,
+              44,
+              34,
+              102,
+              117,
+              108,
+              108,
+              78,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              82,
+              111,
+              104,
+              97,
+              110,
+              32,
+              86,
+              101,
+              114,
+              109,
+              97,
+              34,
+              44,
+              34,
+              99,
+              108,
+              97,
+              115,
+              115,
+              34,
+              58,
+              34,
+              57,
+              34,
+              44,
+              34,
+              115,
+              101,
+              99,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              65,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              108,
+              78,
+              117,
+              109,
+              98,
+              101,
+              114,
+              34,
+              58,
+              34,
+              48,
+              51,
+              34,
+              44,
+              34,
+              100,
+              111,
+              98,
+              34,
+              58,
+              34,
+              50,
+              48,
+              48,
+              57,
+              45,
+              48,
+              49,
+              45,
+              49,
+              48,
+              34,
+              44,
+              34,
+              101,
+              109,
+              97,
+              105,
+              108,
+              34,
+              58,
+              34,
+              114,
+              111,
+              104,
+              97,
+              110,
+              64,
+              101,
+              120,
+              97,
+              109,
+              112,
+              108,
+              101,
+              46,
+              99,
+              111,
+              109,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              110,
+              101,
+              34,
+              58,
+              34,
+              57,
+              56,
+              55,
+              54,
+              53,
+              52,
+              51,
+              50,
+              49,
+              50,
+              34,
+              44,
+              34,
+              97,
+              100,
+              100,
+              114,
+              101,
+              115,
+              115,
+              34,
+              58,
+              34,
+              55,
+              56,
+              57,
+              32,
+              76,
+              97,
+              107,
+              101,
+              32,
+              86,
+              105,
+              101,
+              119,
+              44,
+              32,
+              66,
+              97,
+              110,
+              103,
+              97,
+              108,
+              111,
+              114,
+              101,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              49,
+              45,
+              50,
+              55,
+              84,
+              49,
+              50,
+              58,
+              51,
+              50,
+              58,
+              50,
+              52,
+              46,
+              57,
+              52,
+              54,
+              90,
+              34,
+              125,
+              93,
+              44,
+              34,
+              116,
+              111,
+              116,
+              97,
+              108,
+              34,
+              58,
+              51,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 4,
+          "responseSize": 718
+        },
+        "id": "41bde84e-3f76-4456-8af1-d641b9da1302",
+        "assertions": [
+          {
+            "assertion": "Status code is 200 OK",
+            "skipped": false
+          },
+          {
+            "assertion": "Returns non-empty students array",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "8bfa20b0-a5e9-400c-9136-3664964cf90a",
+          "length": 9,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "ea4bca72-6a75-4f44-9b8c-79e56956d98c"
+        },
+        "item": {
+          "id": "54418873-bea8-4e5c-95a2-63f3e842bf98",
+          "name": "5. Create Student - Positive (POST)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "students"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Ayesha Khan\",\n  \"class\": \"10\",\n  \"section\": \"A\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Islamabad\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "36442059-fb21-4f2b-98f0-4695e8b72191",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Created student matches payload', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "  pm.expect(json.data.fullName).to.eql('Ayesha Khan');",
+                  "  pm.expect(json.data.class).to.eql('10');",
+                  "  pm.expect(json.data.rollNumber).to.eql('45');",
+                  "  pm.collectionVariables.set('createdStudentId', json.data.id);",
+                  "});"
+                ],
+                "_lastExecutionId": "e3cf3d0b-ab1e-4e8c-b426-f2a1a7204b17"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "students"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "7873505c-cb95-4600-965b-09591e6e4c8b",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "196",
+              "system": true
+            },
+            {
+              "key": "Cookie",
+              "value": "connect.sid=s%3ACZHV8UrBsaQAJUUEG2yYFrR1S7-rDLXZ.coWgtf7cTJzGWTmqi2JWVVZzGnBe15uCfzoGwqYtqVM",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fullName\": \"Ayesha Khan\",\n  \"class\": \"10\",\n  \"section\": \"A\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Islamabad\"\n}"
+          }
+        },
+        "response": {
+          "id": "39bc4890-4523-4ea3-9b28-7c0989d94ed3",
+          "status": "Created",
+          "code": 201,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "279"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"117-UgRofBFMA+aTHkypZ3Ju1mlG1kg\""
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              116,
+              117,
+              100,
+              101,
+              110,
+              116,
+              32,
+              97,
+              100,
+              100,
+              101,
+              100,
+              32,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              102,
+              117,
+              108,
+              108,
+              121,
+              34,
+              44,
+              34,
+              100,
+              97,
+              116,
+              97,
+              34,
+              58,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              83,
+              84,
+              85,
+              48,
+              48,
+              52,
+              34,
+              44,
+              34,
+              102,
+              117,
+              108,
+              108,
+              78,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              65,
+              121,
+              101,
+              115,
+              104,
+              97,
+              32,
+              75,
+              104,
+              97,
+              110,
+              34,
+              44,
+              34,
+              99,
+              108,
+              97,
+              115,
+              115,
+              34,
+              58,
+              34,
+              49,
+              48,
+              34,
+              44,
+              34,
+              115,
+              101,
+              99,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              65,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              108,
+              78,
+              117,
+              109,
+              98,
+              101,
+              114,
+              34,
+              58,
+              34,
+              52,
+              53,
+              34,
+              44,
+              34,
+              100,
+              111,
+              98,
+              34,
+              58,
+              34,
+              50,
+              48,
+              48,
+              56,
+              45,
+              48,
+              53,
+              45,
+              49,
+              52,
+              34,
+              44,
+              34,
+              101,
+              109,
+              97,
+              105,
+              108,
+              34,
+              58,
+              34,
+              97,
+              121,
+              101,
+              115,
+              104,
+              97,
+              64,
+              101,
+              120,
+              97,
+              109,
+              112,
+              108,
+              101,
+              46,
+              99,
+              111,
+              109,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              110,
+              101,
+              34,
+              58,
+              34,
+              48,
+              51,
+              48,
+              48,
+              49,
+              50,
+              51,
+              52,
+              53,
+              54,
+              55,
+              34,
+              44,
+              34,
+              97,
+              100,
+              100,
+              114,
+              101,
+              115,
+              115,
+              34,
+              58,
+              34,
+              73,
+              115,
+              108,
+              97,
+              109,
+              97,
+              98,
+              97,
+              100,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              49,
+              45,
+              50,
+              55,
+              84,
+              49,
+              50,
+              58,
+              51,
+              50,
+              58,
+              50,
+              53,
+              46,
+              53,
+              54,
+              52,
+              90,
+              34,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 5,
+          "responseSize": 279
+        },
+        "id": "54418873-bea8-4e5c-95a2-63f3e842bf98",
+        "assertions": [
+          {
+            "assertion": "Status code is 201 Created",
+            "skipped": false
+          },
+          {
+            "assertion": "Created student matches payload",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "053757d7-6f9c-4b15-8df6-e692169e4a47",
+          "length": 9,
+          "cycles": 1,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "45613d5f-0f84-4b19-ad92-f4e8cf40c2a4"
+        },
+        "item": {
+          "id": "2aa4e17f-064a-4a16-b14e-af0822349694",
+          "name": "6. Create Student Missing Fields - Negative (POST)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "students"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Incomplete Student\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "0da24116-a65e-4594-b1b2-3530b5797589",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Validation error returned', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.eql(false);",
+                  "  pm.expect(json.message).to.eql('Required fields missing');",
+                  "});"
+                ],
+                "_lastExecutionId": "8e9e81c3-dc02-4c25-86b8-51ca23a3c246"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "students"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "a5f75c6e-1191-461f-9707-e31cd5fa86f4",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "38",
+              "system": true
+            },
+            {
+              "key": "Cookie",
+              "value": "connect.sid=s%3ACZHV8UrBsaQAJUUEG2yYFrR1S7-rDLXZ.coWgtf7cTJzGWTmqi2JWVVZzGnBe15uCfzoGwqYtqVM",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fullName\": \"Incomplete Student\"\n}"
+          }
+        },
+        "response": {
+          "id": "c94c5834-b1d0-4f07-bc54-c98b1b6b18e1",
+          "status": "Bad Request",
+          "code": 400,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "53"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"35-u45yCey7S0UYbYFLOHWPwhjehzM\""
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              82,
+              101,
+              113,
+              117,
+              105,
+              114,
+              101,
+              100,
+              32,
+              102,
+              105,
+              101,
+              108,
+              100,
+              115,
+              32,
+              109,
+              105,
+              115,
+              115,
+              105,
+              110,
+              103,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 6,
+          "responseSize": 53
+        },
+        "id": "2aa4e17f-064a-4a16-b14e-af0822349694",
+        "assertions": [
+          {
+            "assertion": "Status code is 400 Bad Request",
+            "skipped": false
+          },
+          {
+            "assertion": "Validation error returned",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "39229a8f-9c7b-48ef-83c5-b37838519966",
+          "length": 9,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "df35e3ea-014f-446c-a61d-8daa77edd56b"
+        },
+        "item": {
+          "id": "18bdc143-b7a5-4b48-8567-edb9bb9d2b45",
+          "name": "7. Update Student (PUT)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "students",
+                "{{createdStudentId}}"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Ayesha Khan Updated\",\n  \"class\": \"10\",\n  \"section\": \"B\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha.updated@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Lahore\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "56700998-cae6-4170-8eea-55566277ad71",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Updated student fields reflect changes', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "  pm.expect(json.data.fullName).to.eql('Ayesha Khan Updated');",
+                  "  pm.expect(json.data.section).to.eql('B');",
+                  "});"
+                ],
+                "_lastExecutionId": "2786ff79-75c4-49fe-8c5c-1931c09e0066"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "students",
+              "STU004"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "40b0d8f2-37df-45d0-923d-b82be694db9f",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "209",
+              "system": true
+            },
+            {
+              "key": "Cookie",
+              "value": "connect.sid=s%3ACZHV8UrBsaQAJUUEG2yYFrR1S7-rDLXZ.coWgtf7cTJzGWTmqi2JWVVZzGnBe15uCfzoGwqYtqVM",
+              "system": true
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"fullName\": \"Ayesha Khan Updated\",\n  \"class\": \"10\",\n  \"section\": \"B\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha.updated@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Lahore\"\n}"
+          }
+        },
+        "response": {
+          "id": "d393b400-cc81-447c-b5ad-b3e942f2697c",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "294"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"126-SaS3eBVC8MP+5IAtJtosA1yTCz4\""
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              116,
+              117,
+              100,
+              101,
+              110,
+              116,
+              32,
+              117,
+              112,
+              100,
+              97,
+              116,
+              101,
+              100,
+              32,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              102,
+              117,
+              108,
+              108,
+              121,
+              34,
+              44,
+              34,
+              100,
+              97,
+              116,
+              97,
+              34,
+              58,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              83,
+              84,
+              85,
+              48,
+              48,
+              52,
+              34,
+              44,
+              34,
+              102,
+              117,
+              108,
+              108,
+              78,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              65,
+              121,
+              101,
+              115,
+              104,
+              97,
+              32,
+              75,
+              104,
+              97,
+              110,
+              32,
+              85,
+              112,
+              100,
+              97,
+              116,
+              101,
+              100,
+              34,
+              44,
+              34,
+              99,
+              108,
+              97,
+              115,
+              115,
+              34,
+              58,
+              34,
+              49,
+              48,
+              34,
+              44,
+              34,
+              115,
+              101,
+              99,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              66,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              108,
+              78,
+              117,
+              109,
+              98,
+              101,
+              114,
+              34,
+              58,
+              34,
+              52,
+              53,
+              34,
+              44,
+              34,
+              100,
+              111,
+              98,
+              34,
+              58,
+              34,
+              50,
+              48,
+              48,
+              56,
+              45,
+              48,
+              53,
+              45,
+              49,
+              52,
+              34,
+              44,
+              34,
+              101,
+              109,
+              97,
+              105,
+              108,
+              34,
+              58,
+              34,
+              97,
+              121,
+              101,
+              115,
+              104,
+              97,
+              46,
+              117,
+              112,
+              100,
+              97,
+              116,
+              101,
+              100,
+              64,
+              101,
+              120,
+              97,
+              109,
+              112,
+              108,
+              101,
+              46,
+              99,
+              111,
+              109,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              110,
+              101,
+              34,
+              58,
+              34,
+              48,
+              51,
+              48,
+              48,
+              49,
+              50,
+              51,
+              52,
+              53,
+              54,
+              55,
+              34,
+              44,
+              34,
+              97,
+              100,
+              100,
+              114,
+              101,
+              115,
+              115,
+              34,
+              58,
+              34,
+              76,
+              97,
+              104,
+              111,
+              114,
+              101,
+              34,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              49,
+              49,
+              45,
+              50,
+              55,
+              84,
+              49,
+              50,
+              58,
+              51,
+              50,
+              58,
+              50,
+              53,
+              46,
+              53,
+              54,
+              52,
+              90,
+              34,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 294
+        },
+        "id": "18bdc143-b7a5-4b48-8567-edb9bb9d2b45",
+        "assertions": [
+          {
+            "assertion": "Status code is 200 OK",
+            "skipped": false
+          },
+          {
+            "assertion": "Updated student fields reflect changes",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "66dcd407-cad2-4ef2-9bed-6484d8f0034a",
+          "length": 9,
+          "cycles": 1,
+          "position": 7,
+          "iteration": 0,
+          "httpRequestId": "480ec5c9-b528-4001-af7e-90f54f2ccdad"
+        },
+        "item": {
+          "id": "92a41b02-a6d6-41a9-ad47-a4059551c1ed",
+          "name": "8. Delete Student (DELETE)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "students",
+                "{{createdStudentId}}"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "DELETE"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "ea734637-c6b1-421d-a6a9-eddc471784c2",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Deletion confirmation returned', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "  pm.expect(json.message).to.eql('Student deleted successfully');",
+                  "});"
+                ],
+                "_lastExecutionId": "dbdf8893-2921-43c7-962c-a6ffd45397b6"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "students",
+              "STU004"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "4299d6e2-2f21-4147-a67b-97ec70822ba4",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Cookie",
+              "value": "connect.sid=s%3ACZHV8UrBsaQAJUUEG2yYFrR1S7-rDLXZ.coWgtf7cTJzGWTmqi2JWVVZzGnBe15uCfzoGwqYtqVM",
+              "system": true
+            }
+          ],
+          "method": "DELETE"
+        },
+        "response": {
+          "id": "20de4f78-7b13-443a-9839-d26bfeb2e818",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "57"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"39-xw0KezZu/YhV0m+0pRdGibzHKUE\""
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              116,
+              117,
+              100,
+              101,
+              110,
+              116,
+              32,
+              100,
+              101,
+              108,
+              101,
+              116,
+              101,
+              100,
+              32,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              102,
+              117,
+              108,
+              108,
+              121,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 5,
+          "responseSize": 57
+        },
+        "id": "92a41b02-a6d6-41a9-ad47-a4059551c1ed",
+        "assertions": [
+          {
+            "assertion": "Status code is 200 OK",
+            "skipped": false
+          },
+          {
+            "assertion": "Deletion confirmation returned",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "b60b30ee-63eb-4f5e-af97-7a66c4879584",
+          "length": 9,
+          "cycles": 1,
+          "position": 8,
+          "iteration": 0,
+          "httpRequestId": "06d4b5f8-1ee6-4ace-bdb2-347f3136d06f"
+        },
+        "item": {
+          "id": "1040d4a5-55d9-4fd4-9fd2-3b980a4ea438",
+          "name": "9. Get Deleted Student - Negative (GET)",
+          "request": {
+            "url": {
+              "path": [
+                "api",
+                "students",
+                "{{createdStudentId}}"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "6e4de88a-3907-4d99-9cb4-f8c5001fc0cb",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404 Not Found', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Error message indicates Student not found', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.eql(false);",
+                  "  pm.expect(json.message).to.eql('Student not found');",
+                  "});"
+                ],
+                "_lastExecutionId": "a5f944a2-e98f-4f43-b5b3-da42f1116921"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3055",
+            "path": [
+              "api",
+              "students",
+              "STU004"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "d972e24c-7191-43bc-9ae1-06a13a86bfdc",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:3055",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Cookie",
+              "value": "connect.sid=s%3ACZHV8UrBsaQAJUUEG2yYFrR1S7-rDLXZ.coWgtf7cTJzGWTmqi2JWVVZzGnBe15uCfzoGwqYtqVM",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "003d7ba0-f91f-4e90-bdd2-8a170ebe0f40",
+          "status": "Not Found",
+          "code": 404,
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "47"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"2f-CcyZLWZCGVWXlNqu57Mf/PW6lkA\""
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 27 Nov 2026 12:32:25 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              115,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              34,
+              58,
+              102,
+              97,
+              108,
+              115,
+              101,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              116,
+              117,
+              100,
+              101,
+              110,
+              116,
+              32,
+              110,
+              111,
+              116,
+              32,
+              102,
+              111,
+              117,
+              110,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 7,
+          "responseSize": 47
+        },
+        "id": "1040d4a5-55d9-4fd4-9fd2-3b980a4ea438",
+        "assertions": [
+          {
+            "assertion": "Status code is 404 Not Found",
+            "skipped": false
+          },
+          {
+            "assertion": "Error message indicates Student not found",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 1661
+    },
+    "failures": [],
+    "error": null
+  }
+}
