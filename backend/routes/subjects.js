@@ -10,13 +10,12 @@ router.get('/', isAuthenticated, (req, res) => {
 });
 
 // GET /api/subjects/:id
-router.get('/: 1', isAuthenticated, (req, res) => {
+router.get('/:id', isAuthenticated, (req, res) => {
   const sub = db.subjects.find(s => s.id === req.params.id);
   if (!sub) return res.status(404).json({ success: false, message: 'Subject not found' });
   res.json({ success: true, data: sub });
 });
 
- ,
 // POST /api/subjects
 router.post('/', isAuthenticated, (req, res) => {
   const { name, code, class: cls, maxMarks } = req.body;

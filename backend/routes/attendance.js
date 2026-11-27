@@ -5,7 +5,7 @@ const db = require('../config/db');
 const { isAuthenticated } = require('../middleware/auth');
 
 // GET /api/attendance - Get attendance records (filter by date/student)
-router.get('/', isAut henticated, (req, res) => {
+router.get('/', isAuthenticated, (req, res) => {
   const { date, studentId, class: cls } = req.query;
   let records = [...db.attendance];
 

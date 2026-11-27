@@ -1,4 +1,3 @@
 node_modules/
-.envgit reset
-git add .
-git status
+.env
+.DS_Store
