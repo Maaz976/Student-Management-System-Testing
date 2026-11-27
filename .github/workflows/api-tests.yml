@@ -1,0 +1,35 @@
+name: Postman API Tests
+
+on:
+  push:
+    branches: [ main, "feature/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install backend dependencies
+        run: npm --prefix backend install
+
+      - name: Install Postman/Newman test dependencies
+        run: npm --prefix tests/postman install
+
+      - name: Run Postman API collection via Newman
+        run: npm --prefix tests/postman test
+
+      - name: Upload Postman execution artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-test-results
+          path: |
+            tests/postman/postman-execution-results.json
+            tests/postman/postman-execution-log.txt

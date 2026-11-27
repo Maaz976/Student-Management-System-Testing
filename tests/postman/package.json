@@ -1,0 +1,12 @@
+{
+  "name": "student-management-api-tests",
+  "version": "1.0.0",
+  "description": "Postman/Newman API test runner for Student Management System",
+  "private": true,
+  "scripts": {
+    "test": "node run-api-tests.js"
+  },
+  "dependencies": {
+    "newman": "^6.2.1"
+  }
+}
