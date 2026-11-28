@@ -1,0 +1,90 @@
+name: Selenium UI Tests
+
+# ASSUMPTIONS (edit if your team differs):
+#  - Selenium tests are Python + pytest, in tests/selenium/
+#  - Optional tests/selenium/requirements.txt (selenium, pytest, pytest-html are installed regardless)
+#  - Tests read the app URL from the BASE_URL env var and run Chrome headless
+#    (set HEADLESS=1 is provided; your driver setup should honour it)
+#  - Failure screenshots are saved to tests/selenium/screenshots/
+#  - The Express server serves the frontend at http://localhost:3000
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  BASE_URL: http://localhost:3000
+  HEADLESS: "1"
+  ADMIN_USER: admin
+  ADMIN_PASS: admin123
+
+jobs:
+  selenium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Start application
+        working-directory: backend
+        run: |
+          setsid nohup npm start > "$GITHUB_WORKSPACE/server.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf "$BASE_URL/api/health" > /dev/null; then
+              echo "App is up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "App failed to start"
+          cat "$GITHUB_WORKSPACE/server.log"
+          exit 1
+
+      - name: Install Selenium test dependencies
+        working-directory: tests/selenium
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium pytest pytest-html
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Show browser versions
+        run: |
+          google-chrome --version
+          chromedriver --version || true
+
+      - name: Run Selenium tests
+        working-directory: tests/selenium
+        run: |
+          mkdir -p screenshots reports
+          pytest -v --html=reports/selenium-report.html --self-contained-html --junitxml=reports/junit.xml
+
+      - name: Upload Selenium report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-results
+          path: |
+            tests/selenium/reports/
+            tests/selenium/screenshots/
+            server.log
+          if-no-files-found: ignore
