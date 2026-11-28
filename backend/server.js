@@ -23,9 +23,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // set true in production with HTTPS
+    secure: false,
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000
   }
 }));
 
@@ -49,10 +49,15 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`\n🎓 Student Management System`);
-  console.log(`✅ Server running at http://localhost:${PORT}`);
-  console.log(`📚 API available at http://localhost:${PORT}/api`);
-  console.log(`\n🔑 Admin Login: username=admin, password=admin123\n`);
-});
+// Start listening only when this file is executed directly.
+// Tests can import the Express app without opening a network port.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n🎓 Student Management System`);
+    console.log(`✅ Server running at http://localhost:${PORT}`);
+    console.log(`📚 API available at http://localhost:${PORT}/api`);
+    console.log(`\n🔑 Admin Login: username=admin, password=admin123\n`);
+  });
+}
+
+module.exports = app;
