@@ -1,20 +1,20 @@
 === Postman / Newman API Execution Summary ===
-Timestamp: 2026-11-27T12:32:25.715Z
+Timestamp: 2026-11-28T07:38:58.994Z
 Base URL: http://localhost:3055
-Requests Executed: 9
-Assertions Total: 18
+Requests Executed: 38
+Assertions Total: 76
 Assertions Failed: 0
 
-1. 1. Health Check (GET) -> HTTP 200 (22ms)
+1. 1. Health Check (GET) -> HTTP 200 (20ms)
   [PASS] Status code is 200 OK
   [PASS] Health status is ok
-2. 2. Login Invalid Credentials - Negative (POST) -> HTTP 401 (124ms)
+2. 2. Login Invalid Credentials - Negative (POST) -> HTTP 401 (154ms)
   [PASS] Status code is 401 Unauthorized
   [PASS] Response indicates invalid credentials
-3. 3. Login Valid Admin (POST) -> HTTP 200 (101ms)
+3. 3. Login Valid Admin (POST) -> HTTP 200 (112ms)
   [PASS] Status code is 200 OK
   [PASS] Admin login succeeds and returns admin info
-4. 4. Get All Students (GET) -> HTTP 200 (4ms)
+4. 4. Get All Students (GET) -> HTTP 200 (5ms)
   [PASS] Status code is 200 OK
   [PASS] Returns non-empty students array
 5. 5. Create Student - Positive (POST) -> HTTP 201 (5ms)
@@ -23,12 +23,99 @@ Assertions Failed: 0
 6. 6. Create Student Missing Fields - Negative (POST) -> HTTP 400 (6ms)
   [PASS] Status code is 400 Bad Request
   [PASS] Validation error returned
-7. 7. Update Student (PUT) -> HTTP 200 (7ms)
+7. 7. Update Student (PUT) -> HTTP 200 (10ms)
   [PASS] Status code is 200 OK
   [PASS] Updated student fields reflect changes
-8. 8. Delete Student (DELETE) -> HTTP 200 (5ms)
+8. 8. Delete Student (DELETE) -> HTTP 200 (6ms)
   [PASS] Status code is 200 OK
   [PASS] Deletion confirmation returned
 9. 9. Get Deleted Student - Negative (GET) -> HTTP 404 (7ms)
   [PASS] Status code is 404 Not Found
   [PASS] Error message indicates Student not found
+10. 10. Get All Subjects -> HTTP 200 (7ms)
+  [PASS] Status code is 200 OK
+  [PASS] Returns a non-empty subjects array
+11. 11. Get Existing Subject -> HTTP 200 (5ms)
+  [PASS] Status code is 200 OK
+  [PASS] Returns the requested subject
+12. 12. Create Subject - Positive (POST) -> HTTP 201 (5ms)
+  [PASS] Status code is 201 Created
+  [PASS] Subject was created with the submitted values
+13. 13. Create Duplicate Subject Code - Negative (POST) -> HTTP 400 (5ms)
+  [PASS] Status code is 400 Bad Request
+  [PASS] Duplicate subject code is rejected
+14. 14. Create Subject Missing Required Fields - Negative (POST) -> HTTP 400 (6ms)
+  [PASS] Status code is 400 Bad Request
+  [PASS] Missing name and code are rejected
+15. 15. Update Created Subject (PUT) -> HTTP 200 (6ms)
+  [PASS] Status code is 200 OK
+  [PASS] Subject fields reflect the update
+16. 16. Delete Created Subject (DELETE) -> HTTP 200 (5ms)
+  [PASS] Status code is 200 OK
+  [PASS] Deletion confirmation is returned
+17. 17. Get Deleted Subject - Negative (GET) -> HTTP 404 (5ms)
+  [PASS] Status code is 404 Not Found
+  [PASS] Deleted subject is no longer found
+18. 18. Get All Attendance Records (GET) -> HTTP 200 (5ms)
+  [PASS] Status code is 200 OK
+  [PASS] Attendance records are returned
+19. 19. Get Attendance by Date (GET) -> HTTP 200 (7ms)
+  [PASS] Status code is 200 OK
+  [PASS] Date filter returns matching attendance records
+20. 20. Mark Attendance Missing Required Fields - Negative (POST) -> HTTP 400 (6ms)
+  [PASS] Status code is 400 Bad Request
+  [PASS] Missing date is rejected
+21. 21. Mark Attendance - Positive (POST) -> HTTP 200 (7ms)
+  [PASS] Status code is 200 OK
+  [PASS] Attendance is saved
+22. 22. Retrieve Created Attendance Record (GET) -> HTTP 200 (5ms)
+  [PASS] Status code is 200 OK
+  [PASS] Created attendance record can be retrieved
+23. 23. Update Attendance Status (PUT) -> HTTP 200 (6ms)
+  [PASS] Status code is 200 OK
+  [PASS] Attendance status is updated
+24. 24. Get Attendance Statistics (GET) -> HTTP 200 (6ms)
+  [PASS] Status code is 200 OK
+  [PASS] Attendance statistics contain expected numeric fields
+25. 25. Update Non-existent Attendance Record - Negative (PUT) -> HTTP 404 (6ms)
+  [PASS] Status code is 404 Not Found
+  [PASS] Unknown attendance record is rejected
+26. 26. Get All Marks (GET) -> HTTP 200 (6ms)
+  [PASS] Status code is 200 OK
+  [PASS] Marks list contains enriched records
+27. 27. Get Marks for Existing Student (GET) -> HTTP 200 (6ms)
+  [PASS] Status code is 200 OK
+  [PASS] Student filter returns only matching records
+28. 28. Create Marks Missing Required Fields - Negative (POST) -> HTTP 400 (5ms)
+  [PASS] Status code is 400 Bad Request
+  [PASS] Missing marks value is rejected
+29. 29. Create Marks Exceeding Maximum - Negative (POST) -> HTTP 400 (4ms)
+  [PASS] Status code is 400 Bad Request
+  [PASS] Marks above maximum are rejected
+30. 30. Enter Marks - Positive (POST) -> HTTP 201 (5ms)
+  [PASS] Status code is 201 Created
+  [PASS] Marks record is created with correct values
+31. 31. Enter Existing Student-Subject-Exam Marks Again (POST) -> HTTP 200 (5ms)
+  [PASS] Status code is 200 OK for existing marks
+  [PASS] Existing marks record is updated instead of duplicated
+32. 32. Update Created Marks (PUT) -> HTTP 200 (4ms)
+  [PASS] Status code is 200 OK
+  [PASS] Marks values are updated
+33. 33. Get Student Result Card (GET) -> HTTP 200 (6ms)
+  [PASS] Status code is 200 OK
+  [PASS] Result card includes student, subject results and overall grade
+34. 34. Get Marks Dashboard Statistics (GET) -> HTTP 200 (6ms)
+  [PASS] Status code is 200 OK
+  [PASS] Dashboard returns student, subject and performance statistics
+35. 35. Get Created Marks by Filters (GET) -> HTTP 200 (5ms)
+  [PASS] Status code is 200 OK
+  [PASS] Filters return the updated marks record
+36. 36. Delete Created Marks (DELETE) -> HTTP 200 (5ms)
+  [PASS] Status code is 200 OK
+  [PASS] Marks record is deleted
+37. 37. Verify Deleted Marks Are Absent (GET) -> HTTP 200 (5ms)
+  [PASS] Status code is 200 OK
+  [PASS] Deleted marks record is no longer returned
+38. 38. Delete Non-existent Marks Record - Negative (DELETE) -> HTTP 404 (4ms)
+  [PASS] Status code is 404 Not Found
+  [PASS] Unknown marks record is rejected
