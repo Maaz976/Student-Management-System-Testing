@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="12" failures="0" errors="0" time="0.974">
+  <testsuite name="Black-box test suite — 12 test cases across six techniques" errors="0" failures="0" skipped="0" timestamp="2026-11-28T10:13:28" time="0.897" tests="12">
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Equivalence Partitioning BB-EP-01: valid administrator credentials are accepted" name="Black-box test suite — 12 test cases across six techniques Equivalence Partitioning BB-EP-01: valid administrator credentials are accepted" time="0.098">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Equivalence Partitioning BB-EP-02: an invalid password is rejected" name="Black-box test suite — 12 test cases across six techniques Equivalence Partitioning BB-EP-02: an invalid password is rejected" time="0.114">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Equivalence Partitioning BB-EP-03: an unknown username is rejected" name="Black-box test suite — 12 test cases across six techniques Equivalence Partitioning BB-EP-03: an unknown username is rejected" time="0.003">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Boundary Value Analysis BB-BVA-01: zero marks are accepted at the lower boundary" name="Black-box test suite — 12 test cases across six techniques Boundary Value Analysis BB-BVA-01: zero marks are accepted at the lower boundary" time="0.005">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Boundary Value Analysis BB-BVA-02: maximum marks are accepted at the upper boundary" name="Black-box test suite — 12 test cases across six techniques Boundary Value Analysis BB-BVA-02: maximum marks are accepted at the upper boundary" time="0.004">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Boundary Value Analysis BB-BVA-03: marks one above the maximum are rejected" name="Black-box test suite — 12 test cases across six techniques Boundary Value Analysis BB-BVA-03: marks one above the maximum are rejected" time="0.003">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Decision Table Testing BB-DT-01: missing username is rejected" name="Black-box test suite — 12 test cases across six techniques Decision Table Testing BB-DT-01: missing username is rejected" time="0.004">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Decision Table Testing BB-DT-02: missing password is rejected" name="Black-box test suite — 12 test cases across six techniques Decision Table Testing BB-DT-02: missing password is rejected" time="0.004">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques State Transition Testing BB-ST-01: login grants access, logout removes access" name="Black-box test suite — 12 test cases across six techniques State Transition Testing BB-ST-01: login grants access, logout removes access" time="0.125">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Scenario-Based Testing BB-SC-01: administrator creates, retrieves, updates, and deletes a student" name="Black-box test suite — 12 test cases across six techniques Scenario-Based Testing BB-SC-01: administrator creates, retrieves, updates, and deletes a student" time="0.009">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Error Guessing BB-EG-01: creating a student without required fields is rejected" name="Black-box test suite — 12 test cases across six techniques Error Guessing BB-EG-01: creating a student without required fields is rejected" time="0.003">
+    </testcase>
+    <testcase classname="Black-box test suite — 12 test cases across six techniques Error Guessing BB-EG-02: duplicate roll number in the same class and section is rejected" name="Black-box test suite — 12 test cases across six techniques Error Guessing BB-EG-02: duplicate roll number in the same class and section is rejected" time="0.002">
+    </testcase>
+  </testsuite>
+</testsuites>
