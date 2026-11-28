@@ -1,321 +1,1911 @@
 {
-  "info": {
-    "_postman_id": "a3d8f6b0-4b89-4c11-9e1e-2026sqe00001",
-    "name": "Student Management System API Tests",
-    "description": "Postman API test collection for SE3002 SQE Assignment 3 (Task 5). Covers GET, POST, PUT, DELETE, authentication, positive and negative cases, HTTP status assertions, and response field validation.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3000" },
-    { "key": "createdStudentId", "value": "" }
-  ],
-  "item": [
-    {
-      "name": "1. Health Check (GET)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Health status is ok', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.status).to.eql('ok');",
-              "  pm.expect(json.message).to.include('Student Management API');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/health",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "health"]
-        }
-      }
-    },
-    {
-      "name": "2. Login Invalid Credentials - Negative (POST)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 401 Unauthorized', function () {",
-              "  pm.response.to.have.status(401);",
-              "});",
-              "pm.test('Response indicates invalid credentials', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.success).to.eql(false);",
-              "  pm.expect(json.message).to.eql('Invalid credentials');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpass\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/auth/login",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "auth", "login"]
-        }
-      }
-    },
-    {
-      "name": "3. Login Valid Admin (POST)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Admin login succeeds and returns admin info', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.success).to.eql(true);",
-              "  pm.expect(json.admin.username).to.eql('admin');",
-              "  pm.expect(json.admin.name).to.eql('Administrator');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/auth/login",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "auth", "login"]
-        }
-      }
-    },
-    {
-      "name": "4. Get All Students (GET)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Returns non-empty students array', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.success).to.eql(true);",
-              "  pm.expect(json.data).to.be.an('array');",
-              "  pm.expect(json.total).to.be.at.least(3);",
-              "  pm.expect(json.data[0]).to.have.property('fullName');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/students",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "students"]
-        }
-      }
-    },
-    {
-      "name": "5. Create Student - Positive (POST)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 201 Created', function () {",
-              "  pm.response.to.have.status(201);",
-              "});",
-              "pm.test('Created student matches payload', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.success).to.eql(true);",
-              "  pm.expect(json.data.fullName).to.eql('Ayesha Khan');",
-              "  pm.expect(json.data.class).to.eql('10');",
-              "  pm.expect(json.data.rollNumber).to.eql('45');",
-              "  pm.collectionVariables.set('createdStudentId', json.data.id);",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"fullName\": \"Ayesha Khan\",\n  \"class\": \"10\",\n  \"section\": \"A\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Islamabad\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/students",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "students"]
-        }
-      }
-    },
-    {
-      "name": "6. Create Student Missing Fields - Negative (POST)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 400 Bad Request', function () {",
-              "  pm.response.to.have.status(400);",
-              "});",
-              "pm.test('Validation error returned', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.success).to.eql(false);",
-              "  pm.expect(json.message).to.eql('Required fields missing');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"fullName\": \"Incomplete Student\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/students",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "students"]
-        }
-      }
-    },
-    {
-      "name": "7. Update Student (PUT)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Updated student fields reflect changes', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.success).to.eql(true);",
-              "  pm.expect(json.data.fullName).to.eql('Ayesha Khan Updated');",
-              "  pm.expect(json.data.section).to.eql('B');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "PUT",
-        "header": [
-          { "key": "Content-Type", "value": "application/json" }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"fullName\": \"Ayesha Khan Updated\",\n  \"class\": \"10\",\n  \"section\": \"B\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha.updated@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Lahore\"\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/students/{{createdStudentId}}",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "students", "{{createdStudentId}}"]
-        }
-      }
-    },
-    {
-      "name": "8. Delete Student (DELETE)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Deletion confirmation returned', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.success).to.eql(true);",
-              "  pm.expect(json.message).to.eql('Student deleted successfully');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/students/{{createdStudentId}}",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "students", "{{createdStudentId}}"]
-        }
-      }
-    },
-    {
-      "name": "9. Get Deleted Student - Negative (GET)",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 404 Not Found', function () {",
-              "  pm.response.to.have.status(404);",
-              "});",
-              "pm.test('Error message indicates Student not found', function () {",
-              "  const json = pm.response.json();",
-              "  pm.expect(json.success).to.eql(false);",
-              "  pm.expect(json.message).to.eql('Student not found');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/students/{{createdStudentId}}",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "students", "{{createdStudentId}}"]
-        }
-      }
-    }
-  ]
+	"info": {
+		"_postman_id": "6ac4d17a-0aaa-4475-8684-05fae78936cf",
+		"name": "Student Management System API Tests",
+		"description": "Postman API test collection for SE3002 SQE Assignment 3 (Task 5). Covers GET, POST, PUT, DELETE, authentication, positive and negative cases, HTTP status assertions, and response field validation.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "60141299",
+		"_collection_link": "https://m-maaz-ktk976-9775065.postman.co/workspace/99c86a61-2e02-452a-830c-a8ecade599b0/collection/60141299-6ac4d17a-0aaa-4475-8684-05fae78936cf?action=share&source=collection_link&creator=60141299"
+	},
+	"item": [
+		{
+			"name": "Log In",
+			"item": [
+				{
+					"name": "1. Health Check (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Health status is ok', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.status).to.eql('ok');",
+									"  pm.expect(json.message).to.include('Student Management API');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Login Invalid Credentials - Negative (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 401 Unauthorized', function () {",
+									"  pm.response.to.have.status(401);",
+									"});",
+									"pm.test('Response indicates invalid credentials', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(false);",
+									"  pm.expect(json.message).to.eql('Invalid credentials');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpass\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Login Valid Admin (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Admin login succeeds and returns admin info', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.admin.username).to.eql('admin');",
+									"  pm.expect(json.admin.name).to.eql('Administrator');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Students API",
+			"item": [
+				{
+					"name": "4. Get All Students (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Returns non-empty students array', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.data).to.be.an('array');",
+									"  pm.expect(json.total).to.be.at.least(3);",
+									"  pm.expect(json.data[0]).to.have.property('fullName');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/students",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Create Student - Positive (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 201 Created', function () {",
+									"  pm.response.to.have.status(201);",
+									"});",
+									"pm.test('Created student matches payload', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.data.fullName).to.eql('Ayesha Khan');",
+									"  pm.expect(json.data.class).to.eql('10');",
+									"  pm.expect(json.data.rollNumber).to.eql('45');",
+									"  pm.collectionVariables.set('createdStudentId', json.data.id);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Ayesha Khan\",\n  \"class\": \"10\",\n  \"section\": \"A\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Islamabad\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/students",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Create Student Missing Fields - Negative (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 400 Bad Request', function () {",
+									"  pm.response.to.have.status(400);",
+									"});",
+									"pm.test('Validation error returned', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(false);",
+									"  pm.expect(json.message).to.eql('Required fields missing');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Incomplete Student\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/students",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Update Student (PUT)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Updated student fields reflect changes', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.data.fullName).to.eql('Ayesha Khan Updated');",
+									"  pm.expect(json.data.section).to.eql('B');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Ayesha Khan Updated\",\n  \"class\": \"10\",\n  \"section\": \"B\",\n  \"rollNumber\": \"45\",\n  \"dob\": \"2008-05-14\",\n  \"email\": \"ayesha.updated@example.com\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Lahore\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/students/{{createdStudentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"{{createdStudentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. Delete Student (DELETE)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200 OK', function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Deletion confirmation returned', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(true);",
+									"  pm.expect(json.message).to.eql('Student deleted successfully');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/students/{{createdStudentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"{{createdStudentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. Get Deleted Student - Negative (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 404 Not Found', function () {",
+									"  pm.response.to.have.status(404);",
+									"});",
+									"pm.test('Error message indicates Student not found', function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json.success).to.eql(false);",
+									"  pm.expect(json.message).to.eql('Student not found');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/students/{{createdStudentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"{{createdStudentId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subjects API",
+			"item": [
+				{
+					"name": "10. Get All Subjects",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Returns a non-empty subjects array\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data).to.be.an(\"array\").that.is.not.empty;",
+									"    pm.expect(response.total).to.be.a(\"number\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "11. Get Existing Subject",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Returns the requested subject\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data.id).to.eql(\"SUB001\");",
+									"    pm.expect(response.data.name).to.be.a(\"string\").and.not.empty;",
+									"    pm.expect(response.data.code).to.be.a(\"string\").and.not.empty;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects/SUB001",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"SUB001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "12. Create Subject - Positive (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function ()",
+									"{",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Subject was created with the submitted values\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data.name).to.eql(\"Postman Test Subject\");",
+									"    pm.expect(response.data.code).to.eql(\"POSTMAN101\");",
+									"    pm.expect(response.data.class).to.eql(\"10\");",
+									"    pm.expect(response.data.maxMarks).to.eql(100);",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"createdSubjectId\", response.data.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Postman Test Subject\",\n    \"code\": \"POSTMAN101\",\n    \"class\": \"10\",\n    \"maxMarks\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "13. Create Duplicate Subject Code - Negative (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function ()",
+									"{",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Duplicate subject code is rejected\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(false);",
+									"    pm.expect(response.message).to.eql(\"Subject code already exists\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Duplicate Postman Subject\",\n    \"code\": \"POSTMAN101\",\n    \"class\": \"10\",\n    \"maxMarks\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "14. Create Subject Missing Required Fields - Negative (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function ()",
+									"{",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Missing name and code are rejected\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(false);",
+									"    pm.expect(response.message).to.eql(\"Name and code required\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"class\": \"10\",\n    \"maxMarks\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "15. Update Created Subject (PUT)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Subject fields reflect the update\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data.id).to.eql(pm.collectionVariables.get(\"createdSubjectId\"));",
+									"    pm.expect(response.data.name).to.eql(\"Updated Postman Subject\");",
+									"    pm.expect(response.data.maxMarks).to.eql(150);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Postman Subject\",\n    \"code\": \"POSTMAN101\",\n    \"class\": \"10\",\n    \"maxMarks\": 150\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects/{{createdSubjectId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"{{createdSubjectId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "16. Delete Created Subject (DELETE)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Deletion confirmation is returned\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.message).to.eql(\"Subject deleted successfully\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects/{{createdSubjectId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"{{createdSubjectId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "17. Get Deleted Subject - Negative (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 404 Not Found\", function ()",
+									"{",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Deleted subject is no longer found\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(false);",
+									"    pm.expect(response.message).to.eql(\"Subject not found\");",
+									"});",
+									"",
+									"pm.collectionVariables.unset(\"createdSubjectId\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/subjects/{{createdSubjectId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"{{createdSubjectId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attendance API",
+			"item": [
+				{
+					"name": "18. Get All Attendance Records (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Attendance records are returned\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data).to.be.an(\"array\");",
+									"    pm.expect(response.data.length).to.be.at.least(1);",
+									"    pm.expect(response.data[0]).to.have.property(\"studentName\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/attendance",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"attendance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "19. Get Attendance by Date (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Date filter returns matching attendance records\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data).to.be.an(\"array\").that.is.not.empty;",
+									"    response.data.forEach(function (record)",
+									"    {",
+									"        pm.expect(record.date).to.eql(\"2025-01-15\");",
+									"    });",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/attendance?date=2025-01-15",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"attendance"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2025-01-15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "20. Mark Attendance Missing Required Fields - Negative (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function ()",
+									"{",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Missing date is rejected\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(false);",
+									"    pm.expect(response.message).to.eql(\"Date and records array required\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"records\": [\n        {\n            \"studentId\": \"STU003\",\n            \"status\": \"present\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/attendance/bulk",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"attendance",
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "21. Mark Attendance - Positive (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Attendance is saved\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.message).to.eql(\"Attendance saved for 1 students\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": \"2099-12-31\",\n    \"records\": [\n        {\n            \"studentId\": \"STU003\",\n            \"status\": \"present\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/attendance/bulk",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"attendance",
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "22. Retrieve Created Attendance Record (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Created attendance record can be retrieved\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data).to.be.an(\"array\").that.has.lengthOf(1);",
+									"    pm.expect(response.data[0].studentId).to.eql(\"STU003\");",
+									"    pm.expect(response.data[0].date).to.eql(\"2099-12-31\");",
+									"    pm.expect(response.data[0].status).to.eql(\"present\");",
+									"    pm.collectionVariables.set(\"createdAttendanceId\", response.data[0].id);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/attendance?date=2099-12-31&studentId=STU003",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"attendance"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2099-12-31"
+								},
+								{
+									"key": "studentId",
+									"value": "STU003"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "23. Update Attendance Status (PUT)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Attendance status is updated\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.message).to.eql(\"Attendance updated\");",
+									"    pm.expect(response.data.status).to.eql(\"absent\");",
+									"    pm.expect(response.data.id).to.eql(pm.collectionVariables.get(\"createdAttendanceId\"));",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"absent\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/attendance/{{createdAttendanceId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"attendance",
+								"{{createdAttendanceId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "24. Get Attendance Statistics (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Attendance statistics contain expected numeric fields\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data.total).to.be.a(\"number\");",
+									"    pm.expect(response.data.present).to.be.a(\"number\");",
+									"    pm.expect(response.data.absent).to.be.a(\"number\");",
+									"    pm.expect(response.data.percentage).to.exist;",
+									"    pm.expect(Number(response.data.percentage)).to.be.within(0, 100);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/attendance/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"attendance",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "25. Update Non-existent Attendance Record - Negative (PUT)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 404 Not Found\", function ()",
+									"{",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Unknown attendance record is rejected\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(false);",
+									"    pm.expect(response.message).to.eql(\"Record not found\");",
+									"});",
+									"",
+									"pm.collectionVariables.unset(\"createdAttendanceId\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"present\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/attendance/ATT999999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"attendance",
+								"ATT999999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Marks API",
+			"item": [
+				{
+					"name": "26. Get All Marks (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Marks list contains enriched records\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data).to.be.an(\"array\").that.is.not.empty;",
+									"    pm.expect(response.data[0]).to.have.property(\"studentName\");",
+									"    pm.expect(response.data[0]).to.have.property(\"subjectName\");",
+									"    pm.expect(response.data[0]).to.have.property(\"percentage\");",
+									"    pm.expect(response.data[0]).to.have.property(\"grade\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/marks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "27. Get Marks for Existing Student (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Student filter returns only matching records\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data).to.be.an(\"array\").that.is.not.empty;",
+									"    response.data.forEach(function (record)",
+									"    {",
+									"        pm.expect(record.studentId).to.eql(\"STU001\");",
+									"    });",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/marks?studentId=STU001",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks"
+							],
+							"query": [
+								{
+									"key": "studentId",
+									"value": "STU001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "28. Create Marks Missing Required Fields - Negative (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function ()",
+									"{",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Missing marks value is rejected\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(false);",
+									"    pm.expect(response.message).to.eql(\"Required fields missing\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"studentId\": \"STU003\",\n    \"subjectId\": \"SUB005\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/marks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "29. Create Marks Exceeding Maximum - Negative (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 Bad Request\", function ()",
+									"{",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Marks above maximum are rejected\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(false);",
+									"    pm.expect(response.message).to.eql(\"Marks cannot exceed max marks\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"studentId\": \"STU003\",\n    \"subjectId\": \"SUB005\",\n    \"marks\": 120,\n    \"maxMarks\": 100,\n    \"examType\": \"PostmanQA2099\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/marks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "30. Enter Marks - Positive (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function ()",
+									"{",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Marks record is created with correct values\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.message).to.eql(\"Marks entered successfully\");",
+									"    pm.expect(response.data.studentId).to.eql(\"STU003\");",
+									"    pm.expect(response.data.subjectId).to.eql(\"SUB005\");",
+									"    pm.expect(response.data.marks).to.eql(88);",
+									"    pm.expect(response.data.maxMarks).to.eql(100);",
+									"    pm.expect(response.data.examType).to.eql(\"PostmanQA2099\");",
+									"    pm.collectionVariables.set(\"createdMarkId\", response.data.id);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"studentId\": \"STU003\",\n    \"subjectId\": \"SUB005\",\n    \"marks\": 88,\n    \"maxMarks\": 100,\n    \"examType\": \"PostmanQA2099\",\n    \"date\": \"2099-12-31\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/marks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "31. Enter Existing Student-Subject-Exam Marks Again (POST)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK for existing marks\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Existing marks record is updated instead of duplicated\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.message).to.eql(\"Marks updated\");",
+									"    pm.expect(response.data.id).to.eql(pm.collectionVariables.get(\"createdMarkId\"));",
+									"    pm.expect(response.data.marks).to.eql(91);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"studentId\": \"STU003\",\n    \"subjectId\": \"SUB005\",\n    \"marks\": 91,\n    \"maxMarks\": 100,\n    \"examType\": \"PostmanQA2099\",\n    \"date\": \"2099-12-31\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/marks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "32. Update Created Marks (PUT)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Marks values are updated\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.message).to.eql(\"Marks updated\");",
+									"    pm.expect(response.data.id).to.eql(pm.collectionVariables.get(\"createdMarkId\"));",
+									"    pm.expect(response.data.marks).to.eql(95);",
+									"    pm.expect(response.data.maxMarks).to.eql(100);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"marks\": 95,\n    \"maxMarks\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/marks/{{createdMarkId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks",
+								"{{createdMarkId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "33. Get Student Result Card (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Result card includes student, subject results and overall grade\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data.student.id).to.eql(\"STU003\");",
+									"    pm.expect(response.data.subjects).to.be.an(\"array\").that.is.not.empty;",
+									"    pm.expect(response.data.totalMarks).to.eql(95);",
+									"    pm.expect(response.data.totalMaxMarks).to.eql(100);",
+									"    pm.expect(response.data.overallPercentage).to.eql(\"95.0\");",
+									"    pm.expect(response.data.overallGrade).to.eql(\"A+\");",
+									"    pm.expect(response.data.status).to.eql(\"PASS\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/marks/result/STU003",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks",
+								"result",
+								"STU003"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "34. Get Marks Dashboard Statistics (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Dashboard returns student, subject and performance statistics\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data.totalStudents).to.be.a(\"number\");",
+									"    pm.expect(response.data.totalSubjects).to.be.a(\"number\");",
+									"    pm.expect(Number(response.data.attendancePercentage)).to.be.within(0, 100);",
+									"    pm.expect(Number(response.data.avgPercentage)).to.be.within(0, 100);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/marks/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks",
+								"dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "35. Get Created Marks by Filters (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Filters return the updated marks record\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data).to.be.an(\"array\").that.has.lengthOf(1);",
+									"    pm.expect(response.data[0].id).to.eql(pm.collectionVariables.get(\"createdMarkId\"));",
+									"    pm.expect(response.data[0].marks).to.eql(95);",
+									"    pm.expect(response.data[0].grade).to.eql(\"A+\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/marks?studentId=STU003&subjectId=SUB005&examType=PostmanQA2099",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks"
+							],
+							"query": [
+								{
+									"key": "studentId",
+									"value": "STU003"
+								},
+								{
+									"key": "subjectId",
+									"value": "SUB005"
+								},
+								{
+									"key": "examType",
+									"value": "PostmanQA2099"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "36. Delete Created Marks (DELETE)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Marks record is deleted\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.message).to.eql(\"Marks deleted\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/marks/{{createdMarkId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks",
+								"{{createdMarkId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "37. Verify Deleted Marks Are Absent (GET)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function ()",
+									"{",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Deleted marks record is no longer returned\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(true);",
+									"    pm.expect(response.data).to.be.an(\"array\").that.is.empty;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/marks?studentId=STU003&subjectId=SUB005&examType=PostmanQA2099",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks"
+							],
+							"query": [
+								{
+									"key": "studentId",
+									"value": "STU003"
+								},
+								{
+									"key": "subjectId",
+									"value": "SUB005"
+								},
+								{
+									"key": "examType",
+									"value": "PostmanQA2099"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "38. Delete Non-existent Marks Record - Negative (DELETE)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 404 Not Found\", function ()",
+									"{",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Unknown marks record is rejected\", function ()",
+									"{",
+									"    pm.expect(response.success).to.eql(false);",
+									"    pm.expect(response.message).to.eql(\"Record not found\");",
+									"});",
+									"",
+									"pm.collectionVariables.unset(\"createdMarkId\");"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/marks/MRK999999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"marks",
+								"MRK999999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "createdStudentId",
+			"value": ""
+		}
+	]
 }
