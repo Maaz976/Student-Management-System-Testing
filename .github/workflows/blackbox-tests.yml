@@ -1,0 +1,72 @@
+name: Black Box Tests
+
+# ASSUMPTIONS (edit if your team differs):
+#  - Black-box tests treat the app as a closed system and hit it over HTTP
+#    (equivalence partitioning, boundary values, etc.)
+#  - They live in tests/blackbox/ with their own package.json and a "test" script
+#    (e.g. Jest + supertest/fetch). The base URL is read from BASE_URL.
+#  - Postman/Newman already has its own workflow, so it is not repeated here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  BASE_URL: http://localhost:3000
+  ADMIN_USER: admin
+  ADMIN_PASS: admin123
+
+jobs:
+  blackbox:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Start application
+        working-directory: backend
+        run: |
+          setsid nohup npm start > "$GITHUB_WORKSPACE/server.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf "$BASE_URL/api/health" > /dev/null; then
+              echo "App is up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "App failed to start"
+          cat "$GITHUB_WORKSPACE/server.log"
+          exit 1
+
+      - name: Install black-box test dependencies
+        working-directory: tests/blackbox
+        run: npm install --no-audit --no-fund
+
+      - name: Run black-box tests
+        working-directory: tests/blackbox
+        run: npm test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blackbox-results
+          path: |
+            tests/blackbox/reports/
+            tests/blackbox/junit.xml
+            server.log
+          if-no-files-found: ignore

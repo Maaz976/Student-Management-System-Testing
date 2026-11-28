@@ -1,0 +1,62 @@
+name: White Box Tests
+
+# ASSUMPTIONS (edit if your team differs):
+#  - Tests are Jest-based and live under backend/ or tests/whitebox/
+#  - backend/package.json has a "test" script, e.g. "jest --coverage"
+#  - In-memory data store, so no database service is needed
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  whitebox:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit / integration tests with coverage
+        env:
+          NODE_ENV: test
+        run: npm test -- --coverage --coverageReporters=text --coverageReporters=lcov --coverageReporters=json-summary
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            node -e "
+              const s = require('./coverage/coverage-summary.json').total;
+              const row = (k) => '| ' + k + ' | ' + s[k].pct + '% | ' + s[k].covered + '/' + s[k].total + ' |';
+              console.log('### White Box Coverage\n');
+              console.log('| Metric | Coverage | Covered |');
+              console.log('|---|---|---|');
+              ['statements','branches','functions','lines'].forEach(k => console.log(row(k)));
+            " >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: whitebox-coverage
+          path: backend/coverage/
+          if-no-files-found: warn

@@ -1,0 +1,157 @@
+name: JMeter Performance Tests
+
+# ASSUMPTIONS (edit if your team differs):
+#  - The test plan is tests/jmeter/student-management.jmx
+#  - The plan reads these JMeter properties (use ${__P(host,localhost)} etc.):
+#      host, port, protocol, threads, rampup, duration
+#  - Run in non-GUI mode; an HTML dashboard is generated and uploaded
+#  - The job fails if the error rate or average response time exceeds the limits below
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      threads:
+        description: "Number of virtual users"
+        required: false
+        default: "20"
+      duration:
+        description: "Test duration in seconds"
+        required: false
+        default: "60"
+
+env:
+  JMETER_VERSION: "5.6.3"
+  JMX_FILE: tests/jmeter/student-management.jmx
+  BASE_URL: http://localhost:3000
+  THREADS: ${{ github.event.inputs.threads || '20' }}
+  RAMPUP: "10"
+  DURATION: ${{ github.event.inputs.duration || '60' }}
+  # Pass/fail thresholds
+  MAX_ERROR_RATE_PERCENT: "5"
+  MAX_AVG_RESPONSE_MS: "1000"
+
+jobs:
+  jmeter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Java (required by JMeter)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Start application
+        working-directory: backend
+        run: |
+          setsid nohup npm start > "$GITHUB_WORKSPACE/server.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf "$BASE_URL/api/health" > /dev/null; then
+              echo "App is up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "App failed to start"
+          cat "$GITHUB_WORKSPACE/server.log"
+          exit 1
+
+      - name: Cache JMeter
+        id: cache-jmeter
+        uses: actions/cache@v4
+        with:
+          path: apache-jmeter-${{ env.JMETER_VERSION }}
+          key: jmeter-${{ env.JMETER_VERSION }}
+
+      - name: Download JMeter
+        if: steps.cache-jmeter.outputs.cache-hit != 'true'
+        run: |
+          curl -fsSL "https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz" -o jmeter.tgz
+          tar -xzf jmeter.tgz
+          rm jmeter.tgz
+
+      - name: Run JMeter test plan (non-GUI)
+        run: |
+          rm -rf jmeter-results jmeter-report
+          mkdir -p jmeter-results
+          ./apache-jmeter-${JMETER_VERSION}/bin/jmeter -n \
+            -t "$JMX_FILE" \
+            -l jmeter-results/results.jtl \
+            -j jmeter-results/jmeter.log \
+            -e -o jmeter-report \
+            -Jprotocol=http \
+            -Jhost=localhost \
+            -Jport=3000 \
+            -Jthreads="$THREADS" \
+            -Jrampup="$RAMPUP" \
+            -Jduration="$DURATION"
+
+      - name: Check performance thresholds
+        run: |
+          python3 - <<'PY'
+          import csv, os, sys
+
+          max_err = float(os.environ["MAX_ERROR_RATE_PERCENT"])
+          max_avg = float(os.environ["MAX_AVG_RESPONSE_MS"])
+
+          total = failed = elapsed_sum = 0
+          with open("jmeter-results/results.jtl", newline="") as f:
+              for row in csv.DictReader(f):
+                  total += 1
+                  elapsed_sum += int(row["elapsed"])
+                  if row["success"].strip().lower() != "true":
+                      failed += 1
+
+          if total == 0:
+              print("No samples recorded; failing.")
+              sys.exit(1)
+
+          err_rate = failed / total * 100
+          avg_ms = elapsed_sum / total
+
+          summary = (
+              "### JMeter Summary\n\n"
+              "| Metric | Value | Limit |\n|---|---|---|\n"
+              f"| Samples | {total} | |\n"
+              f"| Error rate | {err_rate:.2f}% | {max_err}% |\n"
+              f"| Avg response | {avg_ms:.0f} ms | {max_avg:.0f} ms |\n"
+          )
+          print(summary)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as s:
+              s.write(summary)
+
+          ok = True
+          if err_rate > max_err:
+              print(f"FAIL: error rate {err_rate:.2f}% > {max_err}%"); ok = False
+          if avg_ms > max_avg:
+              print(f"FAIL: avg response {avg_ms:.0f} ms > {max_avg:.0f} ms"); ok = False
+          sys.exit(0 if ok else 1)
+          PY
+
+      - name: Upload JMeter results and HTML dashboard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-results
+          path: |
+            jmeter-report/
+            jmeter-results/
+            server.log
+          if-no-files-found: ignore
